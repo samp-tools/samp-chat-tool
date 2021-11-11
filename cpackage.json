@@ -1,0 +1,6 @@
+{
+	"name": "samp-ct",
+	"type": "app",
+	"files": "src/Main.cpp",
+	"dependencies": [ "json@3.9.1", "fmt@8.0.1" ]
+}

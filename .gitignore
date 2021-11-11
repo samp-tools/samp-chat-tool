@@ -1,3 +1,11 @@
+# Custom
+premake5.lua
+
+testbed/
+bin/
+build/
+.vscode/
+
 # Prerequisites
 *.d
 
