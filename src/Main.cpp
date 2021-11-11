@@ -166,7 +166,7 @@ std::string parseChatJson(AppOptions const& opts_, std::istream& inputFile_)
 					if (opts_.languageEnum.empty())
 						langContent += std::to_string(langIndex);
 					else
-						langContent += opts_.languageEnum + "::" + langs[langId];
+						langContent += "static_cast<int>(" + opts_.languageEnum + "::" + langs[langId] + ")";
 
 					langContent += "] = ";
 
@@ -186,21 +186,23 @@ std::string parseChatJson(AppOptions const& opts_, std::istream& inputFile_)
 					
 				fmt::format_to(std::back_inserter(chatContent),
 						"// \"{}\"\n"
-						"struct {}\n"
+						"class \n\t: public internal::ChatMessageBase\n"
 						"{{\n"
-						"\tconstexpr static auto text = ([]{{\n"
-						"\t\tauto result = std::string_view[{}];\n\n"
+						"\tstatic constexpr auto generateContent = []\n\t{{\n"
+						"\t\tstd::array<std::string_view, {}> result;\n"
 						// Each language will be appended here
-						"{}\n"
+						"{}"
 						// End of languages
 						"\t\treturn result;\n"
-						"\t}})();\n"
-						"}};\n\n"
+						"\t}};\n"
+						"public:\n"
+						"\tstatic constexpr auto text = generateContent();\n"
+						"}} inline constexpr {};\n\n"
 						"",
 						comment,
-						uniqueName,
 						langIndex,
-						langContent
+						langContent,
+						uniqueName
 					);
 
 			}
@@ -240,6 +242,7 @@ std::string parseChatJson(AppOptions const& opts_, std::istream& inputFile_)
 		output += "\n{\n\n";
 	}
 
+	output += "namespace internal {\nstruct ChatMessageBase {};\n}\n\n";
 	output += chatContent;
 
 	// Append namespace end
